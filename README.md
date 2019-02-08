@@ -7,6 +7,8 @@ $ mix archive.install github wojtekmach/gen_callback
 $ mix gen.callback GenServer
 ```
 
+Produces the following output on STDOUT:
+
 ```elixir
 defmodule MyGenServer do
   @behaviour GenServer
