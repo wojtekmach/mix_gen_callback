@@ -60,7 +60,7 @@ defmodule MyGenServer do
 end
 ```
 
-Since protocols behaviours, it's a good starting point for them too:
+Since every protocol is also a behaviour, this also works:
 
 ```
 $ mix gen.callback Enumerable
