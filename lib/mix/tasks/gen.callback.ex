@@ -111,7 +111,7 @@ defmodule Mix.Tasks.Gen.Callback do
     #{if optional?, do: "\# Optional"}
     @impl true
     #{kind} #{head} do
-      raise "#{body}"
+      #{body}
     end
     """
   end
@@ -131,7 +131,7 @@ defmodule Mix.Tasks.Gen.Callback do
       end)
 
     head = "#{name}(#{args_string})"
-    body = "not implemented yet"
+    body = ~s{raise "not implemented yet"}
     optional? = {name, length(args)} in optional_callbacks
     {head, body, optional?}
   end
