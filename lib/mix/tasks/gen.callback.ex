@@ -26,6 +26,8 @@ defmodule Mix.Tasks.Gen.Callback do
     end
   end
 
+  ## Below copied and modified from IEx.Introspection code.
+
   defp gen_callback(behaviour) do
     module = Module.concat([behaviour])
 
