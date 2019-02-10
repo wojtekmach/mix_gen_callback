@@ -39,7 +39,7 @@ defmodule Mix.Tasks.Gen.Callback do
           callbacks
           |> Enum.map(&translate_callback/1)
           |> Enum.sort()
-          |> Enum.map(&format_callback(&1, optional_callbacks))
+          |> Enum.map(&format_callback(&1, optional_callbacks, module))
 
         """
         defmodule My#{behaviour} do
@@ -85,11 +85,11 @@ defmodule Mix.Tasks.Gen.Callback do
     end
   end
 
-  defp format_callback({{kind, name, _arity}, specs}, optional_callbacks) do
+  defp format_callback({{kind, name, _arity}, specs}, optional_callbacks, module) do
     Enum.map(specs, fn spec ->
       Code.Typespec.spec_to_quoted(name, spec)
       |> Macro.prewalk(&drop_macro_env/1)
-      |> format_typespec(kind, 0, optional_callbacks)
+      |> format_typespec(kind, 0, optional_callbacks, module)
     end)
   end
 
@@ -98,14 +98,14 @@ defmodule Mix.Tasks.Gen.Callback do
 
   defp drop_macro_env(other), do: other
 
-  defp format_typespec(definition, kind, _nesting, optional_callbacks) do
+  defp format_typespec(definition, kind, _nesting, optional_callbacks, module) do
     kind =
       case kind do
         :callback -> "def"
         :macrocallback -> "defmacro"
       end
 
-    {head, body, optional?} = parse_definition(definition, optional_callbacks)
+    {head, body, optional?} = parse_definition(definition, optional_callbacks, module)
 
     """
     #{if optional?, do: "\# Optional"}
@@ -116,31 +116,32 @@ defmodule Mix.Tasks.Gen.Callback do
     """
   end
 
-  defp parse_definition({:when, _, [left, _]}, optional_callbacks) do
-    parse_definition(left, optional_callbacks)
+  defp parse_definition({:when, _, [left, _]}, optional_callbacks, module) do
+    parse_definition(left, optional_callbacks, module)
   end
 
-  defp parse_definition({:::, _, [{name, _, args}, _returns]}, optional_callbacks) do
-    args_string = Enum.map_join(args, ", ", &arg_string/1)
+  defp parse_definition({:::, _, [{name, _, args}, _returns]}, optional_callbacks, module) do
+    args_string = Enum.map_join(args, ", ", &arg_string(&1, module))
     head = "#{name}(#{args_string})"
     body = ~s{raise "not implemented yet"}
     optional? = {name, length(args)} in optional_callbacks
     {head, body, optional?}
   end
 
-  defp arg_string({arg_name, _, nil}) when is_atom(arg_name) do
+  defp arg_string({:t, _, args}, module) when args in [nil, []] do
+    name = module |> Module.split() |> Enum.reverse() |> hd() |> Macro.underscore()
+    "_#{name}"
+  end
+
+  defp arg_string({arg_name, _, args}, _module) when is_atom(arg_name) and args in [nil, []] do
     "_#{arg_name}"
   end
 
-  defp arg_string({arg_name, _, []}) when is_atom(arg_name) do
+  defp arg_string({:::, _, [{arg_name, _, nil}, _]}, _module) when is_atom(arg_name) do
     "_#{arg_name}"
   end
 
-  defp arg_string({:::, _, [{arg_name, _, nil}, _]}) when is_atom(arg_name) do
-    "_#{arg_name}"
-  end
-
-  defp arg_string({{:., _, [module, :t]}, _, []}) when is_atom(module) do
+  defp arg_string({{:., _, [module, :t]}, _, []}, _module) when is_atom(module) do
     "_#{Macro.underscore(module)}"
   end
 end
