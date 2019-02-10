@@ -121,18 +121,26 @@ defmodule Mix.Tasks.Gen.Callback do
   end
 
   defp parse_definition({:::, _, [{name, _, args}, _returns]}, optional_callbacks) do
-    args_string =
-      Enum.map_join(args, ", ", fn
-        {:::, _, [{arg_name, _, _}, _arg_type]} ->
-          "_#{arg_name}"
-
-        {arg_name, _, _} ->
-          "_#{arg_name}"
-      end)
-
+    args_string = Enum.map_join(args, ", ", &arg_string/1)
     head = "#{name}(#{args_string})"
     body = ~s{raise "not implemented yet"}
     optional? = {name, length(args)} in optional_callbacks
     {head, body, optional?}
+  end
+
+  defp arg_string({arg_name, _, nil}) when is_atom(arg_name) do
+    "_#{arg_name}"
+  end
+
+  defp arg_string({arg_name, _, []}) when is_atom(arg_name) do
+    "_#{arg_name}"
+  end
+
+  defp arg_string({:::, _, [{arg_name, _, nil}, _]}) when is_atom(arg_name) do
+    "_#{arg_name}"
+  end
+
+  defp arg_string({{:., _, [module, :t]}, _, []}) when is_atom(module) do
+    "_#{Macro.underscore(module)}"
   end
 end
