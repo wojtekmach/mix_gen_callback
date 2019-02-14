@@ -7,7 +7,14 @@ defmodule GenCallback.MixProject do
       version: "0.1.0",
       elixir: "~> 1.5",
       start_permanent: Mix.env() == :prod,
+      docs: docs(),
       deps: deps()
+    ]
+  end
+
+  defp docs() do
+    [
+      main: "Mix.Tasks.Gen.Callback"
     ]
   end
 

@@ -6,6 +6,62 @@ defmodule Mix.Tasks.Gen.Callback do
 
       mix gen.callback BEHAVIOUR
 
+  ## Example
+
+      $ mix gen.callback GenServer
+
+  Produces the following output on STDOUT:
+
+      defmodule MyGenServer do
+        @behaviour GenServer
+
+        # Optional
+        @impl true
+        def code_change(_old_vsn, _state, _extra) do
+          raise "not implemented yet"
+        end
+
+        # Optional
+        @impl true
+        def format_status(_reason, _pdict_and_state) do
+          raise "not implemented yet"
+        end
+
+        # Optional
+        @impl true
+        def handle_call(_request, _from, _state) do
+          raise "not implemented yet"
+        end
+
+        # Optional
+        @impl true
+        def handle_cast(_request, _state) do
+          raise "not implemented yet"
+        end
+
+        # Optional
+        @impl true
+        def handle_continue(_continue, _state) do
+          raise "not implemented yet"
+        end
+
+        # Optional
+        @impl true
+        def handle_info(_msg, _state) do
+          raise "not implemented yet"
+        end
+
+        @impl true
+        def init(_init_arg) do
+          raise "not implemented yet"
+        end
+
+        # Optional
+        @impl true
+        def terminate(_reason, _state) do
+          raise "not implemented yet"
+        end
+      end
   """
 
   @impl true
