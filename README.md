@@ -1,9 +1,9 @@
-# GenCallback
+# MixGenCallback
 
 ## Usage
 
 ```
-$ mix archive.install github wojtekmach/gen_callback
+$ mix archive.install github wojtekmach/mix_gen_callback
 $ mix gen.callback GenServer
 ```
 
