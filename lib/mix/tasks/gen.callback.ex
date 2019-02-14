@@ -20,8 +20,7 @@ defmodule Mix.Tasks.Gen.Callback do
         Mix.raise("""
         Invalid arguments, expected one of:
 
-            mix hex.publish BEHAVIOUR
-
+            mix gen.callback BEHAVIOUR
         """)
     end
   end
