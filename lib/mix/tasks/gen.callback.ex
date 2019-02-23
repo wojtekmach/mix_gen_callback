@@ -96,18 +96,30 @@ defmodule Mix.Tasks.Gen.Callback do
           |> Enum.sort()
           |> Enum.map(&format_callback(&1, optional_callbacks, module))
 
-        """
-        defmodule My#{behaviour} do
-          @behaviour #{behaviour}
-
-          #{defs}
-        end
-        """
+        module_code(module, defs)
         |> Code.format_string!()
         |> IO.puts()
 
       :error ->
         Mix.raise("No callbacks found for #{behaviour}")
+    end
+  end
+
+  defp module_code(module, defs) do
+    if function_exported?(module, :__protocol__, 1) do
+      """
+      defimpl #{inspect(module)} do
+        #{defs}
+      end
+      """
+    else
+      """
+      defmodule My#{inspect(module)} do
+        @behaviour #{inspect(module)}
+
+        #{defs}
+      end
+      """
     end
   end
 
